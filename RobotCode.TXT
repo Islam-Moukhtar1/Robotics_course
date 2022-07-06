@@ -1,0 +1,149 @@
+#define trig 3
+#define echo1 4
+#define echo2 5
+#define echo3 6
+#define leftR 7
+#define leftF 8
+#define rightR 9
+#define rightF 10
+float distance1=0,t1=0;
+float distance2=0,t2=0;
+float distance3=0,t3=0;
+char blutooth_responce='/0';
+char serialReading='/0';
+void sendDistances();
+void calculateDistances();
+void movingButtons();
+void rightForward();
+void leftForward();
+void rightBackward();
+void leftBackward();
+void restRobot();
+void setup()
+{
+  pinMode(rightF,OUTPUT);
+  pinMode(rightR,OUTPUT);
+  pinMode(leftF,OUTPUT);
+  pinMode(leftR,OUTPUT);
+  pinMode(trig,OUTPUT);
+  pinMode(echo1,INPUT);
+  pinMode(echo2,INPUT);
+  pinMode(echo3,INPUT);
+  Serial.begin(9600); //begin the serial to recieve data from the blutooth module on it
+  //initialize the robot to be at rest
+  restRobot();
+  Serial.println("I am waiting now");
+  while(Serial.available()==0); //This line means that it will perform nothing until the application is connected and open initially at the normal screen to send N to the serial monitor 
+  serialReading=Serial.read(); //for the first switch case only
+}
+
+void loop() 
+{
+    
+    switch (serialReading)
+    {
+      case 'N'/*the button that turns to normal screen was pressed*/ :
+        while(serialReading!='U'&& serialReading!='C'/*we are still in normal screen*/)
+        {
+            while(Serial.available()==0);
+            blutooth_responce=Serial.read();
+            movingButtons();  
+        }
+        break;    
+      case 'U' /*the button that turns to ultrasonic screen was pressed*/:
+        while(serialReading!='N'&&serialReading!='C'/*we are still in ultrasonic screen*/)
+        {
+          Serial.println("I am changed");
+          calculateDistances();
+          sendDistances();
+          restRobot();
+          while(Serial.available()==0);
+          blutooth_responce=Serial.read();
+          movingButtons();
+        }
+        break;
+    }
+}
+void calculateDistances()
+{
+    digitalWrite(trig,HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trig,LOW);
+    t1=pulseIn(echo1,HIGH);
+    t2=pulseIn(echo2,HIGH);
+    t3=pulseIn(echo3,HIGH);
+    distance1=0.01715*t1;
+    distance2=0.01715*t2;
+    distance3=0.01715*t3;
+}
+void sendDistances()
+{
+    
+    Serial.println(distance1);
+    Serial.println(distance2);
+    Serial.println(distance3);
+  
+}
+void movingButtons()
+{
+      switch (blutooth_responce)
+      {
+      case 'F' :
+      rightForward();
+      leftForward();
+      Serial.println("forward till change");
+      break;
+      case 'B' :
+      rightBackward();
+      leftBackward(); 
+      Serial.println("backward till change");  
+      break;
+      case 'L' :
+      leftBackward();
+      rightForward();
+      Serial.println("left till change");
+      break;
+      case 'R' :
+      leftForward();
+      rightBackward();
+      Serial.println("right till change");  
+      break;
+      case 'S' :
+      restRobot();
+      Serial.println("REST");
+      break;
+      case 'U' :
+      serialReading='U';
+      break;
+      case 'N' :
+      serialReading='N';
+      break;
+      }
+}
+void rightForward()
+{
+    digitalWrite(rightF,HIGH);
+    digitalWrite(rightR,LOW);
+}
+void leftForward()
+{
+    digitalWrite(leftF,HIGH);
+    digitalWrite(leftR,LOW);
+}
+void rightBackward()
+{
+    digitalWrite(rightR,HIGH);
+    digitalWrite(rightF,LOW);
+}
+void leftBackward()
+{
+    digitalWrite(leftR,HIGH);
+    digitalWrite(leftF,LOW);
+}
+void restRobot()
+{
+  digitalWrite(rightF,LOW);
+  digitalWrite(rightR,LOW);
+  digitalWrite(leftF,LOW);
+  digitalWrite(leftR,LOW);
+}
