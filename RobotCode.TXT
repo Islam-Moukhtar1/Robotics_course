@@ -32,7 +32,7 @@ void setup()
   Serial.begin(9600); //begin the serial to recieve data from the blutooth module on it
   //initialize the robot to be at rest
   restRobot();
-  Serial.println("I am waiting now");
+  Serial.println("I am waiting now ");
   while(Serial.available()==0); //This line means that it will perform nothing until the application is connected and open initially at the normal screen to send N to the serial monitor 
   serialReading=Serial.read(); //for the first switch case only
 }
@@ -43,6 +43,7 @@ void loop()
     switch (serialReading)
     {
       case 'N'/*the button that turns to normal screen was pressed*/ :
+        Serial.println("I GOT N ");
         while(serialReading!='U'&& serialReading!='C'/*we are still in normal screen*/)
         {
             while(Serial.available()==0);
