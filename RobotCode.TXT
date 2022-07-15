@@ -1,9 +1,9 @@
 #define trig 3
-#define echo1 4
-#define echo2 5
-#define echo3 6
-#define leftR 7
-#define leftF 8
+#define echo1 A0
+#define echo2 A1
+#define echo3 A2
+#define leftR 5
+#define leftF 6
 #define rightR 9
 #define rightF 10
 #define collectF 11
@@ -11,9 +11,9 @@
 float distance1=0,t1=0;
 float distance2=0,t2=0;
 float distance3=0,t3=0;
-char blutooth_responce='/0';
-char serialReading='/0';
-char reading='NUL';
+char blutooth_responce=0;
+char serialReading=0;
+char reading=0;
 void sendDistances();
 void calculateDistances();
 void movingButtons();
@@ -24,6 +24,8 @@ void leftBackward();
 void restRobot();
 void collectButton();
 void shootButton();
+void repeatedSteps();
+void movingButtonsD();
 void setup()
 {
   pinMode(rightF,OUTPUT);
@@ -61,12 +63,13 @@ void loop()
         Serial.println("I got U");
         while(serialReading!='N'&&serialReading!='C'/*we are still in ultrasonic screen*/)
         {
-          calculateDistances();
-          sendDistances();
-          restRobot();
-          while(Serial.available()==0);
-          blutooth_responce=Serial.read();
-          movingButtons();
+          if(blutooth_responce==0)
+          {
+             while(Serial.available()==0);
+             blutooth_responce=Serial.read();        
+          }
+
+          movingButtonsD();
         }
         break;
        case 'C' /*the button that turns to collector and shooter screen was pressed*/ :
@@ -87,9 +90,11 @@ void calculateDistances()
     t1=pulseIn(echo1,HIGH);
     digitalWrite(trig,HIGH);
     delayMicroseconds(10); 
+    digitalWrite(trig,LOW);
     t2=pulseIn(echo2,HIGH);
     digitalWrite(trig,HIGH);
     delayMicroseconds(10);
+    digitalWrite(trig,LOW);
     t3=pulseIn(echo3,HIGH);
     distance1=0.01715*t1;
     distance2=0.01715*t2;
@@ -97,11 +102,9 @@ void calculateDistances()
 }
 void sendDistances()
 {
-    
     Serial.println(distance1);
     Serial.println(distance2);
     Serial.println(distance3);
-  
 }
 void movingButtons()
 {
@@ -132,15 +135,25 @@ void movingButtons()
       break;
       case 'U' :
       serialReading='U';
+      blutooth_responce=0;
       break;
       case 'N' :
       serialReading='N';
+      blutooth_responce=0;
       break;
       case 'T' :
       collectButton();
       break;
       case 'O' :
       shootButton();
+      case 'l' :
+      long leftspeed=Serial.parseInt();
+      Serial.find('r');
+      long rightspeed=Serial.parseInt();
+      analogWrite(rightF,rightspeed<0?0:rightspeed);
+      analogWrite(rightR,rightspeed>0?0:-1*rightspeed);
+      analogWrite(leftF,leftspeed<0?0:leftspeed);
+      analogWrite(leftR,leftspeed>0?0:-1*leftspeed);
       break;
       case 's' :
       Serial.println("I STOPPED");
@@ -185,4 +198,55 @@ void shootButton()
 {
     Serial.println("I am shooting");
     digitalWrite(shootF,HIGH);
+}
+void movingButtonsD()
+{
+  switch (blutooth_responce)
+      {
+      case 'F' :
+      rightForward();
+      leftForward();
+      Serial.println("forward till change");
+      repeatedSteps();
+      break;
+      case 'B' :
+      rightBackward();
+      leftBackward(); 
+      Serial.println("backward till change");  
+      repeatedSteps();
+      break;
+      case 'L' :
+      leftBackward();
+      rightForward();
+      Serial.println("left till change");
+      repeatedSteps();
+      break;
+      case 'R' :
+      leftForward();
+      rightBackward();
+      Serial.println("right till change"); 
+      repeatedSteps(); 
+      break;
+      case 'S' :
+      restRobot();
+      blutooth_responce=0;
+      break;
+      case 'U' :
+      serialReading='U';
+      blutooth_responce=0;
+      break;
+      case 'N' :
+      serialReading='N';
+      blutooth_responce=0;
+      break;
+      }
+}
+void repeatedSteps()
+{
+  while(blutooth_responce!='S')
+  {
+    calculateDistances();
+    sendDistances();
+    blutooth_responce=Serial.read();
+  }
 }
