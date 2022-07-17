@@ -8,13 +8,15 @@
 #define rightF 10
 #define collectF 11
 #define shootF 12
-float distance1=0,t1=0;
-float distance2=0,t2=0;
-float distance3=0,t3=0;
+float distance1=0;
+float distance2=0;
+float distance3=0;
+unsigned long t1=0,t2=0,t3=0,initialTime=0;
 long rightspeed=0,leftspeed=0;
 char blutooth_responce=0;
 char serialReading=0;
-char reading=0;
+char reading=0,check1=0,check2=0,check3=0;
+int flag=1;
 void sendDistances();
 void calculateDistances();
 void movingButtons();
@@ -217,7 +219,59 @@ void movingButtonsD()
       rightForward();
       leftForward();
       Serial.println("forward till change");
-      repeatedSteps();
+      //repeatedSteps();
+      while(1)
+      {
+        if(flag==1)
+        {
+          digitalWrite(trig,HIGH);
+          delayMicroseconds(10);
+          initialTime=micros();
+          digitalWrite(trig,LOW);          
+        }
+        blutooth_responce=Serial.read();
+        flag=0;
+        if(digitalRead(echo1)==LOW)
+        {
+          if(check1==0)
+          {
+            t1=micros()-initialTime;
+            distance1=0.01715*t1;
+            Serial.println(distance1);
+          }
+          check1=1;
+        }
+        if(digitalRead(echo2)==LOW)
+        {
+          if(check2==0)
+          {
+            t2=micros()-initialTime;
+            distance2=0.01715*t2;
+            Serial.println(distance2);
+          }
+          check2=1;
+        }
+        if(digitalRead(echo3)==LOW)
+        {
+          if(check3==0)
+          {
+            t3=micros()-initialTime;
+            distance3=0.01715*t3; 
+            Serial.println(distance3);           
+          }
+          check3=1;
+        }
+        if(check1&&check2&&check3)
+        {
+          flag=1;
+          check1=0;
+          check2=0;
+          check3=0;
+        }
+        if(blutooth_responce=='S')
+          break;  
+        
+      }
       break;
       case 'B' :
       rightBackward();
