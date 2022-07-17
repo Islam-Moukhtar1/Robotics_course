@@ -11,6 +11,7 @@
 float distance1=0,t1=0;
 float distance2=0,t2=0;
 float distance3=0,t3=0;
+long rightspeed=0,leftspeed=0;
 char blutooth_responce=0;
 char serialReading=0;
 char reading=0;
@@ -146,14 +147,23 @@ void movingButtons()
       break;
       case 'O' :
       shootButton();
+      case 'r' :
+      Serial.setTimeout(1);
+      rightspeed=Serial.parseInt();
+      analogWrite(rightF,rightspeed<0? 0:rightspeed);
+      analogWrite(rightR,rightspeed>0? 0:-1*rightspeed);
+      Serial.print("I(right) am moving on ");
+      Serial.print(rightspeed);
+      Serial.println(" till change");
+      break;
       case 'l' :
-      long leftspeed=Serial.parseInt();
-      Serial.find('r');
-      long rightspeed=Serial.parseInt();
-      analogWrite(rightF,rightspeed<0?0:rightspeed);
-      analogWrite(rightR,rightspeed>0?0:-1*rightspeed);
-      analogWrite(leftF,leftspeed<0?0:leftspeed);
-      analogWrite(leftR,leftspeed>0?0:-1*leftspeed);
+      Serial.setTimeout(1);
+      leftspeed=Serial.parseInt();
+      analogWrite(leftF,leftspeed<0? 0:leftspeed);
+      analogWrite(leftR,leftspeed>0? 0:-1*leftspeed);
+      Serial.print("I(left) am moving on ");
+      Serial.print(leftspeed);
+      Serial.println(" till change");
       break;
       case 's' :
       Serial.println("I STOPPED");
