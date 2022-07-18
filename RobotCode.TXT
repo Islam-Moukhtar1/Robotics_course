@@ -50,123 +50,123 @@ void setup()
 
 void loop() 
 {
-    switch (serialReading)
+  switch (serialReading)
+  {
+  case 'N'/*the button that turns to normal screen was pressed*/ :
+    Serial.println("I GOT N ");
+    while(serialReading!='U'&& serialReading!='C'/*we are still in normal screen*/)
     {
-      case 'N'/*the button that turns to normal screen was pressed*/ :
-        Serial.println("I GOT N ");
-        while(serialReading!='U'&& serialReading!='C'/*we are still in normal screen*/)
-        {
-            while(Serial.available()==0);
-            blutooth_responce=Serial.read();
-            movingButtons();  
-        }
-        break;    
-      case 'U' /*the button that turns to ultrasonic screen was pressed*/:
-        Serial.println("I got U");
-        while(serialReading!='N'&&serialReading!='C'/*we are still in ultrasonic screen*/)
-        {
-          if(blutooth_responce==0)
-          {
-             while(Serial.available()==0);
-             blutooth_responce=Serial.read();        
-          }
-
-          movingButtonsD();
-        }
-        break;
-       case 'C' /*the button that turns to collector and shooter screen was pressed*/ :
-         Serial.println("I got C(shooter and collector)");
-         while(serialReading!='N' && serialReading !='U')
-         {
-            while(Serial.available()==0);
-            blutooth_responce=Serial.read();
-            movingButtons();
-         }
+      while(Serial.available()==0);
+      blutooth_responce=Serial.read();
+      movingButtons();  
     }
+    break;    
+  case 'U' /*the button that turns to ultrasonic screen was pressed*/:
+    Serial.println("I got U");
+    while(serialReading!='N'&&serialReading!='C'/*we are still in ultrasonic screen*/)
+    {
+      if(blutooth_responce==0)
+      {
+        while(Serial.available()==0);
+        blutooth_responce=Serial.read();        
+      }
+
+      movingButtonsD();
+    }
+    break;
+  case 'C' /*the button that turns to collector and shooter screen was pressed*/ :
+    Serial.println("I got C(shooter and collector)");
+    while(serialReading!='N' && serialReading !='U')
+    {
+      while(Serial.available()==0);
+      blutooth_responce=Serial.read();
+      movingButtons();
+    }
+  }
 }
 void movingButtons()
 {
-      switch (blutooth_responce)
-      {
-      case 'F' :
-      rightForward();
-      leftForward();
-      Serial.println("forward till change");
-      break;
-      case 'B' :
-      rightBackward();
-      leftBackward(); 
-      Serial.println("backward till change");  
-      break;
-      case 'L' :
-      leftBackward();
-      rightForward();
-      Serial.println("left till change");
-      break;
-      case 'R' :
-      leftForward();
-      rightBackward();
-      Serial.println("right till change");  
-      break;
-      case 'S' :
-      restRobot();
-      break;
-      case 'U' :
-      serialReading='U';
-      blutooth_responce=0;
-      break;
-      case 'N' :
-      serialReading='N';
-      blutooth_responce=0;
-      break;
-      case 'T' :
-      collectButton();
-      break;
-      case 'O' :
-      shootButton();
-      case 'r' :
-      Serial.setTimeout(1);
-      rightspeed=Serial.parseInt();
-      analogWrite(rightF,rightspeed<0? 0:rightspeed);
-      analogWrite(rightR,rightspeed>0? 0:-1*rightspeed);
-      Serial.print("I(right) am moving on ");
-      Serial.print(rightspeed);
-      Serial.println(" till change");
-      break;
-      case 'l' :
-      Serial.setTimeout(1);
-      leftspeed=Serial.parseInt();
-      analogWrite(leftF,leftspeed<0? 0:leftspeed);
-      analogWrite(leftR,leftspeed>0? 0:-1*leftspeed);
-      Serial.print("I(left) am moving on ");
-      Serial.print(leftspeed);
-      Serial.println(" till change");
-      break;
-      case 's' :
-      Serial.println("I STOPPED");
-      digitalWrite(collectF,LOW);
-      digitalWrite(shootF,LOW);
-      }
+  switch (blutooth_responce)
+  {
+  case 'F' :
+    rightForward();
+    leftForward();
+    Serial.println("forward till change");
+    break;
+  case 'B' :
+    rightBackward();
+    leftBackward(); 
+    Serial.println("backward till change");  
+    break;
+  case 'L' :
+    leftBackward();
+    rightForward();
+    Serial.println("left till change");
+    break;
+  case 'R' :
+    leftForward();
+    rightBackward();
+    Serial.println("right till change");  
+    break;
+  case 'S' :
+    restRobot();
+    break;
+  case 'U' :
+    serialReading='U';
+    blutooth_responce=0;
+    break;
+  case 'N' :
+    serialReading='N';
+    blutooth_responce=0;
+    break;
+  case 'T' :
+    collectButton();
+    break;
+  case 'O' :
+    shootButton();
+  case 'r' :
+    Serial.setTimeout(1);
+    rightspeed=Serial.parseInt();
+    analogWrite(rightF,rightspeed<0? 0:rightspeed);
+    analogWrite(rightR,rightspeed>0? 0:-1*rightspeed);
+    Serial.print("I(right) am moving on ");
+    Serial.print(rightspeed);
+    Serial.println(" till change");
+    break;
+  case 'l' :
+    Serial.setTimeout(1);
+    leftspeed=Serial.parseInt();
+    analogWrite(leftF,leftspeed<0? 0:leftspeed);
+    analogWrite(leftR,leftspeed>0? 0:-1*leftspeed);
+    Serial.print("I(left) am moving on ");
+    Serial.print(leftspeed);
+    Serial.println(" till change");
+    break;
+  case 's' :
+    Serial.println("I STOPPED");
+    digitalWrite(collectF,LOW);
+    digitalWrite(shootF,LOW);
+  }
 }
 void rightForward()
 {
-    digitalWrite(rightF,HIGH);
-    digitalWrite(rightR,LOW);
+  digitalWrite(rightF,HIGH);
+  digitalWrite(rightR,LOW);
 }
 void leftForward()
 {
-    digitalWrite(leftF,HIGH);
-    digitalWrite(leftR,LOW);
+  digitalWrite(leftF,HIGH);
+  digitalWrite(leftR,LOW);
 }
 void rightBackward()
 {
-    digitalWrite(rightR,HIGH);
-    digitalWrite(rightF,LOW);
+  digitalWrite(rightR,HIGH);
+  digitalWrite(rightF,LOW);
 }
 void leftBackward()
 {
-    digitalWrite(leftR,HIGH);
-    digitalWrite(leftF,LOW);
+  digitalWrite(leftR,HIGH);
+  digitalWrite(leftF,LOW);
 }
 void restRobot()
 {
@@ -178,114 +178,151 @@ void restRobot()
 }
 void collectButton()
 {
-    Serial.println("I am collecting");
-    digitalWrite(collectF,HIGH);
+  Serial.println("I am collecting");
+  digitalWrite(collectF,HIGH);
 }
 void shootButton()
 {
-    Serial.println("I am shooting");
-    digitalWrite(shootF,HIGH);
+  Serial.println("I am shooting");
+  digitalWrite(shootF,HIGH);
 }
 void movingButtonsD()
 {
   switch (blutooth_responce)
-      {
-      case 'F' :
-      rightForward();
-      leftForward();
-      Serial.println("forward till change");
-      getD();
-      break;
-      case 'B' :
-      rightBackward();
-      leftBackward(); 
-      Serial.println("backward till change");  
-      getD();
-      break;
-      case 'L' :
-      leftBackward();
-      rightForward();
-      Serial.println("left till change");
-      getD();
-      break;
-      case 'R' :
-      leftForward();
-      rightBackward();
-      Serial.println("right till change"); 
-      getD();
-      break;
-      case 'S' :
-      restRobot();
-      blutooth_responce=0;
-      break;
-      case 'U' :
-      serialReading='U';
-      blutooth_responce=0;
-      break;
-      case 'N' :
-      serialReading='N';
-      blutooth_responce=0;
-      break;
-      }
+  {
+  case 'F' :
+    rightForward();
+    leftForward();
+    Serial.println("forward till change");
+    getD();
+    break;
+  case 'B' :
+    rightBackward();
+    leftBackward(); 
+    Serial.println("backward till change");  
+    getD();
+    break;
+  case 'L' :
+    leftBackward();
+    rightForward();
+    Serial.println("left till change");
+    getD();
+    break;
+  case 'R' :
+    leftForward();
+    rightBackward();
+    Serial.println("right till change"); 
+    getD();
+    break;
+  case 'S' :
+    restRobot();
+    blutooth_responce=0;
+    break;
+  case 'U' :
+    serialReading='U';
+    blutooth_responce=0;
+    break;
+  case 'N' :
+    serialReading='N';
+    blutooth_responce=0;
+    break;
+  }
 }
 void getD()
 {
-        while(1)
+  while(Serial.available()==0)
+  {  
+    while(Serial.available()==0)
+    {
+      if(flag==1)
       {
-        if(flag==1)
-        {
-          digitalWrite(trig,HIGH);
-          delayMicroseconds(10);
-          digitalWrite(trig,LOW);        
-        }
-        if(digitalRead(echo1)==HIGH&&in1==0)
-        {
-          initial1=micros();
-          in1=1;
-        }
-        
-        if(digitalRead(echo1)==LOW&&in1==1)
-        {
-            t1=micros()-initial1;
-            distance1=0.01715*t1;
-            Serial.println(distance1);
-            in1=0;
-        }
-        /*
-        if(digitalRead(echo2)==HIGH&&in2==0)
-        {
-          initial2=micros();
-          in2=1;
-        }
-        
-        if(digitalRead(echo2)==LOW&&in2==1)
-        {
-            t2=micros()-initial2;
-            distance2=0.01715*t2;
-            Serial.println(distance2);
-            in2=0;
-        }
-        if(digitalRead(echo3)==HIGH&&in3==0)
-        {
-          initial3=micros();
-          in3=1;
-        }
-        
-        if(digitalRead(echo3)==LOW&&in3==1)
-        {
-            t3=micros()-initial3;
-            distance3=0.01715*t3;
-            Serial.println(distance3);
-            in3=0;
-        }*/
-        flag=0;
-        if(t1/*&&t2&&t3*/)
-        {
-          flag=1;
-          t1=0;t2=0;t3=0;
-        }
-        blutooth_responce=Serial.read();
-        if(blutooth_responce=='S')
-          break;    
+        digitalWrite(trig,HIGH);
+        delayMicroseconds(10);
+        digitalWrite(trig,LOW);        
       }
+      if(digitalRead(echo1)==HIGH&&in1==0)
+      {
+        initial1=micros();
+        in1=1;
+      }
+      if(digitalRead(echo1)==LOW&&in1==1)
+      {
+        t1=micros()-initial1;
+        distance1=0.01715*t1;
+        Serial.println(distance1);
+        in1=0;
+      }
+      flag=0;
+      if(t1)
+      {
+        flag=1;
+        t1=0;
+        break;
+      } 
+    }
+    while(Serial.available()==0)
+    {
+      if(flag==1)
+      {
+        digitalWrite(trig,HIGH);
+        delayMicroseconds(10);
+        digitalWrite(trig,LOW);        
+      }
+      if(digitalRead(echo2)==HIGH&&in2==0)
+      {
+        initial2=micros();
+        in2=1;
+      }
+      if(digitalRead(echo2)==LOW&&in2==1)
+      {
+        t2=micros()-initial2;
+        distance2=0.01715*t2;
+        Serial.println(distance2);
+        in2=0;
+      }
+      flag=0;
+      if(t2)
+      {
+        flag=1;
+        t2=0;
+        break;
+      } 
+    }
+    while(Serial.available()==0)
+    {
+      if(flag==1)
+      {
+        digitalWrite(trig,HIGH);
+        delayMicroseconds(10);
+        digitalWrite(trig,LOW);        
+      }
+      if(digitalRead(echo3)==HIGH&&in3==0)
+      {
+        initial3=micros();
+        in3=1;
+      }
+      if(digitalRead(echo3)==LOW&&in3==1)
+      {
+        t3=micros()-initial3;
+        distance3=0.01715*t3;
+        Serial.println(distance3);
+        in3=0;
+      }
+      flag=0;
+      if(t3)
+      {
+        flag=1;
+        t3=0;
+        break;
+      }
+      blutooth_responce=Serial.read();
+      if(blutooth_responce=='S')
+      {
+        flag=1;
+        break;
+      }  
+    }
+  }
+  blutooth_responce=Serial.read();
+  flag=1;
 }
