@@ -11,14 +11,12 @@
 float distance1=0;
 float distance2=0;
 float distance3=0;
-unsigned long t1=0,t2=0,t3=0,initialTime=0;
+unsigned long t1=0,t2=0,t3=0,initial1=0,initial2=0,initial3=0;
 long rightspeed=0,leftspeed=0;
 char blutooth_responce=0;
 char serialReading=0;
-char reading=0,check1=0,check2=0,check3=0;
-int flag=1;
-void sendDistances();
-void calculateDistances();
+char reading=0;
+bool flag=1;
 void movingButtons();
 void rightForward();
 void leftForward();
@@ -27,8 +25,9 @@ void leftBackward();
 void restRobot();
 void collectButton();
 void shootButton();
-void repeatedSteps();
 void movingButtonsD();
+void getD();
+bool in1=0,in2=0,in3=0;
 void setup()
 {
   pinMode(rightF,OUTPUT);
@@ -84,30 +83,6 @@ void loop()
             movingButtons();
          }
     }
-}
-void calculateDistances()
-{
-    digitalWrite(trig,HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trig,LOW);
-    t1=pulseIn(echo1,HIGH);
-    digitalWrite(trig,HIGH);
-    delayMicroseconds(10); 
-    digitalWrite(trig,LOW);
-    t2=pulseIn(echo2,HIGH);
-    digitalWrite(trig,HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trig,LOW);
-    t3=pulseIn(echo3,HIGH);
-    distance1=0.01715*t1;
-    distance2=0.01715*t2;
-    distance3=0.01715*t3;
-}
-void sendDistances()
-{
-    Serial.println(distance1);
-    Serial.println(distance2);
-    Serial.println(distance3);
 }
 void movingButtons()
 {
@@ -219,77 +194,25 @@ void movingButtonsD()
       rightForward();
       leftForward();
       Serial.println("forward till change");
-      //repeatedSteps();
-      while(1)
-      {
-        if(flag==1)
-        {
-          digitalWrite(trig,HIGH);
-          delayMicroseconds(10);
-          initialTime=micros();
-          digitalWrite(trig,LOW);          
-        }
-        blutooth_responce=Serial.read();
-        flag=0;
-        if(digitalRead(echo1)==LOW)
-        {
-          if(check1==0)
-          {
-            t1=micros()-initialTime;
-            distance1=0.01715*t1;
-            Serial.println(distance1);
-          }
-          check1=1;
-        }
-        if(digitalRead(echo2)==LOW)
-        {
-          if(check2==0)
-          {
-            t2=micros()-initialTime;
-            distance2=0.01715*t2;
-            Serial.println(distance2);
-          }
-          check2=1;
-        }
-        if(digitalRead(echo3)==LOW)
-        {
-          if(check3==0)
-          {
-            t3=micros()-initialTime;
-            distance3=0.01715*t3; 
-            Serial.println(distance3);           
-          }
-          check3=1;
-        }
-        if(check1&&check2&&check3)
-        {
-          flag=1;
-          check1=0;
-          check2=0;
-          check3=0;
-        }
-        if(blutooth_responce=='S')
-          break;  
-        
-      }
+      getD();
       break;
       case 'B' :
       rightBackward();
       leftBackward(); 
       Serial.println("backward till change");  
-      repeatedSteps();
+      getD();
       break;
       case 'L' :
       leftBackward();
       rightForward();
       Serial.println("left till change");
-      repeatedSteps();
+      getD();
       break;
       case 'R' :
       leftForward();
       rightBackward();
       Serial.println("right till change"); 
-      repeatedSteps(); 
+      getD();
       break;
       case 'S' :
       restRobot();
@@ -305,12 +228,64 @@ void movingButtonsD()
       break;
       }
 }
-void repeatedSteps()
+void getD()
 {
-  while(blutooth_responce!='S')
-  {
-    calculateDistances();
-    sendDistances();
-    blutooth_responce=Serial.read();
-  }
+        while(1)
+      {
+        if(flag==1)
+        {
+          digitalWrite(trig,HIGH);
+          delayMicroseconds(10);
+          digitalWrite(trig,LOW);        
+        }
+        if(digitalRead(echo1)==HIGH&&in1==0)
+        {
+          initial1=micros();
+          in1=1;
+        }
+        
+        if(digitalRead(echo1)==LOW&&in1==1)
+        {
+            t1=micros()-initial1;
+            distance1=0.01715*t1;
+            Serial.println(distance1);
+            in1=0;
+        }
+        /*
+        if(digitalRead(echo2)==HIGH&&in2==0)
+        {
+          initial2=micros();
+          in2=1;
+        }
+        
+        if(digitalRead(echo2)==LOW&&in2==1)
+        {
+            t2=micros()-initial2;
+            distance2=0.01715*t2;
+            Serial.println(distance2);
+            in2=0;
+        }
+        if(digitalRead(echo3)==HIGH&&in3==0)
+        {
+          initial3=micros();
+          in3=1;
+        }
+        
+        if(digitalRead(echo3)==LOW&&in3==1)
+        {
+            t3=micros()-initial3;
+            distance3=0.01715*t3;
+            Serial.println(distance3);
+            in3=0;
+        }*/
+        flag=0;
+        if(t1/*&&t2&&t3*/)
+        {
+          flag=1;
+          t1=0;t2=0;t3=0;
+        }
+        blutooth_responce=Serial.read();
+        if(blutooth_responce=='S')
+          break;    
+      }
 }
