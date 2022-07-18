@@ -8,10 +8,8 @@
 #define rightF 10
 #define collectF 11
 #define shootF 12
-float distance1=0;
-float distance2=0;
-float distance3=0;
-unsigned long t1=0,t2=0,t3=0,initial1=0,initial2=0,initial3=0;
+float distance=0;
+unsigned long t=0,initial=0;
 long rightspeed=0,leftspeed=0;
 char blutooth_responce=0;
 char serialReading=0;
@@ -27,7 +25,8 @@ void collectButton();
 void shootButton();
 void movingButtonsD();
 void getD();
-bool in1=0,in2=0,in3=0;
+void calculatingLoop(int echo);
+bool in=0;
 void setup()
 {
   pinMode(rightF,OUTPUT);
@@ -232,6 +231,16 @@ void getD()
 {
   while(Serial.available()==0)
   {  
+    calculatingLoop(echo1);
+    calculatingLoop(echo2);
+    calculatingLoop(echo3);
+    delay(250);
+  }
+    blutooth_responce=Serial.read();
+    flag=1;
+}
+void calculatingLoop(int echo)
+{
     while(Serial.available()==0)
     {
       if(flag==1)
@@ -240,79 +249,23 @@ void getD()
         delayMicroseconds(10);
         digitalWrite(trig,LOW);        
       }
-      if(digitalRead(echo1)==HIGH&&in1==0)
+      if(digitalRead(echo3)==HIGH&&in==0)
       {
-        initial1=micros();
-        in1=1;
+        initial=micros();
+        in=1;
       }
-      if(digitalRead(echo1)==LOW&&in1==1)
+      if(digitalRead(echo3)==LOW&&in==1)
       {
-        t1=micros()-initial1;
-        distance1=0.01715*t1;
-        Serial.println(distance1);
-        in1=0;
-      }
-      flag=0;
-      if(t1)
-      {
-        flag=1;
-        t1=0;
-        break;
-      } 
-    }
-    while(Serial.available()==0)
-    {
-      if(flag==1)
-      {
-        digitalWrite(trig,HIGH);
-        delayMicroseconds(10);
-        digitalWrite(trig,LOW);        
-      }
-      if(digitalRead(echo2)==HIGH&&in2==0)
-      {
-        initial2=micros();
-        in2=1;
-      }
-      if(digitalRead(echo2)==LOW&&in2==1)
-      {
-        t2=micros()-initial2;
-        distance2=0.01715*t2;
-        Serial.println(distance2);
-        in2=0;
+        t=micros()-initial;
+        distance=0.01715*t;
+        Serial.println(distance);
+        in=0;
       }
       flag=0;
-      if(t2)
+      if(t)
       {
         flag=1;
-        t2=0;
-        break;
-      } 
-    }
-    while(Serial.available()==0)
-    {
-      if(flag==1)
-      {
-        digitalWrite(trig,HIGH);
-        delayMicroseconds(10);
-        digitalWrite(trig,LOW);        
-      }
-      if(digitalRead(echo3)==HIGH&&in3==0)
-      {
-        initial3=micros();
-        in3=1;
-      }
-      if(digitalRead(echo3)==LOW&&in3==1)
-      {
-        t3=micros()-initial3;
-        distance3=0.01715*t3;
-        Serial.println(distance3);
-        in3=0;
-      }
-      flag=0;
-      if(t3)
-      {
-        flag=1;
-        t3=0;
+        t=0;
         break;
       }
       blutooth_responce=Serial.read();
@@ -322,7 +275,4 @@ void getD()
         break;
       }  
     }
-  }
-  blutooth_responce=Serial.read();
-  flag=1;
 }
