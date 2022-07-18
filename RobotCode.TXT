@@ -238,6 +238,7 @@ void getD()
   }
     blutooth_responce=Serial.read();
     flag=1;
+    t=0;
 }
 void calculatingLoop(int echo)
 {
@@ -266,12 +267,6 @@ void calculatingLoop(int echo)
       {
         flag=1;
         t=0;
-        break;
-      }
-      blutooth_responce=Serial.read();
-      if(blutooth_responce=='S')
-      {
-        flag=1;
         break;
       }  
     }
